@@ -12,30 +12,28 @@ public class Parser {
 	
   
   private Path fFilePath;
-  List<Tweet> tweets = new ArrayList<Tweet>();
+  private List<Tweet> tweets = new ArrayList<Tweet>();
   
   public Parser(String aFileName){
     this.fFilePath = Paths.get(aFileName);
   }
   
-  
 
   public final void processLineByLine() throws IOException {
 
     try (Scanner scanner =  new Scanner(fFilePath, "UTF-8")){
-    	int i=0;
+    	/*int i=0;*/
     
-    	while (scanner.hasNextLine() && i<5){
+    	while (scanner.hasNextLine() /*&& i<4000*/){
     			
     	  processLine(scanner.nextLine() );
     	  
-    	  i++;
+    	/* i++;*/
     	}		 
     	    
     }
   }
  
-
   protected void processLine(String aLine)  throws IOException {
   
 	  
@@ -46,18 +44,19 @@ public class Parser {
 	    	data.add(s.next());
 	    	
 	    	//System.out.println(s.next());
-	    }  
-	    
-	    List<String> words = processText(data.get(3));
-	    
-	    
+	    }     
+	    //Rule out malformed tweets
 	    if (data.size()==5){
+	    	List<String> words = processText(data.get(3));
 	    	tweets.add(new Tweet(data.get(0),data.get(1),data.get(2),data.get(3),data.get(4),words));
+	   	
 	    }else if (data.size()==4){
+	    	List<String> words = processText(data.get(3));
 	    	tweets.add(new Tweet(data.get(0),data.get(1),data.get(2),data.get(3),words));
 	    }else if (data.size()<4){
 	    	//System.out.println("not enough data");
 		}
+	    //Collections.shuffle(tweets);
     }
  
   }
@@ -85,6 +84,7 @@ public class Parser {
   }
   
   public List<Tweet> getTweets(){
+	  
 	  return tweets;
   }
   
