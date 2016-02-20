@@ -3,12 +3,8 @@ package tweets;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
 
 public class Main {
 
@@ -26,37 +22,47 @@ public class Main {
 			List<Tweet> tweets  = new ArrayList<Tweet>(parser.getTweets());
 			
 			System.out.println(tweets.size() +" tweets were parsed");
-			System.out.println("----");
-			//System.out.println(tweets.get(32).getText());
-			Collections.shuffle(tweets);
-			//System.out.println(tweets.get(32).getText());
+			System.out.println("------");
 			
-/*		       for(int i = 0; i <tweets.size(); i=i+3000) {
-		            System.out.println(tweets.get(i).getCity());
-		            System.out.println(tweets.get(i).getLatidude());
-		            System.out.println(tweets.get(i).getLongitude());
-		            System.out.println(tweets.get(i).getText());
-		            System.out.println(tweets.get(i).getUser_location());
-		            for(int j = 0; j <tweets.get(i).getWords().size(); j++) {
-		            	 System.out.println(tweets.get(i).getWords().get(j));
-		            }
-		            System.out.println("----");
-		            
-		            
-		        }*/
+			//randomize tweets' list
+			Collections.shuffle(tweets);
+
 			
 			  
 		    System.out.println("----Naive Bayes----");
-		    
-		    
-		    int tweetstrain = 49500;
+  
+		    int tweetstrain = 2500;
 		  
-		    
+		    NaiveBayes nb ;
 		    String[] classes ={"Athens","Barcelona","Berlin","Cairo","Chicago","Hong Kong","Johannesburg","Sao Paolo","Sydney","Thessaloniki"};
+		    double sum = 0.0;
+		    double acc = 0.0;
+		    int[][] cm = new int[10][10];
+
+		    int n=20;
+		    for(int i=0;i<n;i++){
+		    	System.out.println("Naive Bayes classifier with  " +(tweetstrain*i+10)+" tweets as training set and "+(tweets.size()-(tweetstrain*i+10))+" tweets to test ");
+		    	nb = new NaiveBayes(tweetstrain*i+10, tweets, classes);
+			    nb.train();
+			    acc = nb.test();
+			    sum += acc;
+			    System.out.format("Accuracy: %3.2f%%%n",acc);
+			    cm = nb.getConfusionMatrix();
+		    }
+		   System.out.println("------------------"); 
+		   System.out.format("Overall Accuracy: %3.2f%%%n",sum/n);
+		   System.out.println("Confusion matrix of the last run");  
+		   //int sum2=0;
+		    for(int i=0;i<10;i++){
+		    	 for(int j=0;j<10;j++){
+		    		 System.out.format(" %4d ",cm[i][j]);
+		    		 //sum2+=cm[i][j];
+		    	 }
+		    	 System.out.println();
+		    }
+		    //System.out.println("sum = "+sum2);
 		    
-		    NaiveBayes nb = new NaiveBayes(tweetstrain, tweets, classes);
-		    nb.train();
-		    System.out.format("Accuracy: %3.2f%n ",nb.test());
+
 
 
 			

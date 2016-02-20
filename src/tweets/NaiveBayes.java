@@ -23,6 +23,7 @@ public class NaiveBayes {
 	double max ;
 	int classchosen;
 	int corrects;
+	int[][] confusionMatrix;
 	
 	public NaiveBayes(int trainTweets,List<Tweet> tweets,String[] classes){
 		
@@ -62,8 +63,8 @@ public class NaiveBayes {
 		
 		for(int c = 0;c<classes.length;c++){		
 			priorprob[c] = (double)counter[c]/trainTweets;
-			System.out.println("prior probability P("+classes[c]+"):"+priorprob[c]);
-			System.out.println(classes[c]+ " words "+words[c].size());
+/*			System.out.println("prior probability P("+classes[c]+"):"+priorprob[c]);
+			System.out.println(classes[c]+ " words "+words[c].size());*/
 		}
 		
 		
@@ -80,11 +81,11 @@ public class NaiveBayes {
 	
 	protected double test(){
 		
+		int realcity = -1;
 		//initialize posterior probabilities
 		for(int i=0;i<classes.length;i++){
 			postprob[i] = priorprob[i];
 		}
-		int counter=0;
 		for(int i =trainTweets;i<tweets.size();i++){
 			
 			for(int j=0;j<tweets.get(i).getWords().size();j++){
@@ -103,21 +104,31 @@ public class NaiveBayes {
 					max = postprob[c];
 					classchosen = c;
 				}
+				if(classes[c].equals(tweets.get(i).getCity())){
+					realcity=c;
+				}
 			}
 			if(classes[classchosen].equals(tweets.get(i).getCity())){
 				//System.out.println("Correct");
 				corrects++;
+				confusionMatrix[classchosen][classchosen]++;
 			}else{
 				//System.out.println("Wrong");
+				confusionMatrix[classchosen][realcity]++;
 			}		
+
+			
 			//initialize posterior probabilities
 			for(int j=0;j<classes.length;j++){
 				postprob[j] = priorprob[j];
 			}
-			counter++;
-		}
+			
 		
-		System.out.println("test tweets: "+counter);
+		
+		}
+		System.out.println("Correct classifies:"+corrects);
+		//System.out.println("Number:"+(tweets.size()-trainTweets));
+		
 		
 		
 	
@@ -126,11 +137,22 @@ public class NaiveBayes {
 		
 	}
 	
+	protected int[][] getConfusionMatrix(){
+		return(confusionMatrix);
+	}
+	
 	
 	
 	
 	@SuppressWarnings("unchecked")
 	private void initialize(){
+		
+		confusionMatrix = new int[classes.length][classes.length];
+		for( int i = 0; i < classes.length; i++) {
+			for( int j = 0; j < classes.length; j++) {
+				confusionMatrix[i][j] = 0;
+			}
+		}
 		
 		counter = new int[10];	
 		
