@@ -53,9 +53,8 @@ public class Parser {
 	    }else if (data.size()==4){
 	    	List<String> words = processText(data.get(3));
 	    	tweets.add(new Tweet(data.get(0),data.get(1),data.get(2),data.get(3),words));
-	    }else if (data.size()<4){
-	    	//System.out.println("not enough data");
-		}
+	    }
+
 	    //Collections.shuffle(tweets);
     }
  

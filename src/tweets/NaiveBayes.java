@@ -24,6 +24,8 @@ public class NaiveBayes {
 	int classchosen;
 	int corrects;
 	int[][] confusionMatrix;
+	boolean useImportantWords = false;
+	HashMap<String,Double> important;
 	
 	public NaiveBayes(int trainTweets,List<Tweet> tweets,String[] classes){
 		
@@ -35,22 +37,50 @@ public class NaiveBayes {
 		
 	}
 	
+	public NaiveBayes(int trainTweets,List<Tweet> tweets,Map<String,Double> important,String[] classes){
+		
+		this.trainTweets = trainTweets;
+		this.tweets = tweets;
+		this.classes = classes.clone();
+		this.important = new HashMap<>(important);
+		useImportantWords = true;
+		initialize();
+		
+		
+	}
+	
 	protected void train(){
 		
 		for(int c = 0;c<classes.length;c++){
 			for(int i = 0; i <trainTweets; i++) {
 				if(tweets.get(i).getCity().equals(classes[c])){
 					for(int j=0;j<tweets.get(i).getWords().size();j++){
-						words[c].add(tweets.get(i).getWords().get(j)); //all words in a class
-						uniques.add(tweets.get(i).getWords().get(j)); //unique words in the document
-											
-					    if (wordCount[c].containsKey(tweets.get(i).getWords().get(j))) {
-					        // Map already contains the word key. Just increment it's count by 1
-					        wordCount[c].put(tweets.get(i).getWords().get(j), wordCount[c].get(tweets.get(i).getWords().get(j)) + 1);
-					    } else {
-					        // Map doesn't have mapping for word. Add one with count = 1
-					        wordCount[c].put(tweets.get(i).getWords().get(j), 1);
-					    }
+						if (useImportantWords){
+							if(important.containsKey(tweets.get(i).getWords().get(j))){
+								words[c].add(tweets.get(i).getWords().get(j)); //all words in a class
+								uniques.add(tweets.get(i).getWords().get(j)); //unique words in the document
+													
+							    if (wordCount[c].containsKey(tweets.get(i).getWords().get(j))) {
+							        // Map already contains the word key. Just increment it's count by 1
+							        wordCount[c].put(tweets.get(i).getWords().get(j), wordCount[c].get(tweets.get(i).getWords().get(j)) + 1);
+							    } else {
+							        // Map doesn't have mapping for word. Add one with count = 1
+							        wordCount[c].put(tweets.get(i).getWords().get(j), 1);
+							    }
+							}
+						}else{
+							words[c].add(tweets.get(i).getWords().get(j)); //all words in a class
+							uniques.add(tweets.get(i).getWords().get(j)); //unique words in the document
+												
+						    if (wordCount[c].containsKey(tweets.get(i).getWords().get(j))) {
+						        // Map already contains the word key. Just increment it's count by 1
+						        wordCount[c].put(tweets.get(i).getWords().get(j), wordCount[c].get(tweets.get(i).getWords().get(j)) + 1);
+						    } else {
+						        // Map doesn't have mapping for word. Add one with count = 1
+						        wordCount[c].put(tweets.get(i).getWords().get(j), 1);
+						    }
+							
+						}
 						
 					}
 					counter[c]++;
@@ -58,7 +88,7 @@ public class NaiveBayes {
 				}
 			}	
 		}
-		System.out.println("Vocabulary length "+uniques.size());
+		//System.out.println("Vocabulary length "+uniques.size());
 		
 		
 		for(int c = 0;c<classes.length;c++){		
@@ -126,7 +156,7 @@ public class NaiveBayes {
 		
 		
 		}
-		System.out.println("Correct classifies:"+corrects);
+		System.out.println("Classified correctly:"+corrects);
 		//System.out.println("Number:"+(tweets.size()-trainTweets));
 		
 		
@@ -154,7 +184,7 @@ public class NaiveBayes {
 			}
 		}
 		
-		counter = new int[10];	
+		counter = new int[classes.length];	
 		
 		words = (ArrayList<String>[])new ArrayList[classes.length];
 		
@@ -163,13 +193,13 @@ public class NaiveBayes {
 		}
 		
 		uniques = new HashSet<String>();	
-		wordCount = new HashMap[10];
+		wordCount = new HashMap[classes.length];
 		
 		for( int i = 0; i < classes.length; i++) {
 		    wordCount[i] = new HashMap<>();
 		}	
 	
-		cprob = new HashMap[10];
+		cprob = new HashMap[classes.length];
 		for( int i = 0; i < classes.length; i++) {
 		    cprob[i] = new HashMap<>();
 		}
